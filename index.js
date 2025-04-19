@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 // app.use(cors());
 app.use(express.json());
 
-//Rotas
+//Rotas do usuário
 app.use("/users", userRoutes);
 
 //Iniciar servidor

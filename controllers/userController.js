@@ -2,12 +2,14 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 
+// Criptografa uma senha para a criação de um usuário
 const createCriptographedPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
   return passwordHash;
 };
 
+// Verifica a senha enviada com a armazenada no banco de dados
 const verifyPassword = async (password, passwordHash) => {
   const match = await bcrypt.compare(password, passwordHash);
   return match;
@@ -17,7 +19,21 @@ const verifyPassword = async (password, passwordHash) => {
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
+  // Verifica se o usuário já existe
+  const userExists = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  // Caso já exista, retorna um erro
+  if (userExists) {
+    return res.status(409).json({ message: "Usuário já existe" });
+  }
+
+  // Criptografia da senha
   const passwordHash = await createCriptographedPassword(password);
+
   // Criação do usuário no banco
   const user = await prisma.user.create({
     data: {
@@ -35,26 +51,82 @@ exports.createUser = async (req, res) => {
     .json({ message: "Usuário criado com sucesso!", userWithoutPassword });
 };
 
-//Loga em uma conta
+// Atualização do usuário
+exports.updateUser = async (req, res) => {
+  const { userId } = req.params;
+  const { theme, currency, weekStartDay } = req.body;
+
+  // Possíveis temas para update
+  const possibleThemes = ["light", "dark", "system"];
+
+  // Possíveis opções de início de semana
+  const possibleWeekStartDay = ["monday", "sunday"];
+
+  // Possíveis opções de moeda
+  const possibleCurrencies = ["BRL", "USD", "EUR"];
+
+  // Cria um ojeto de dados apenas com os campos que foram fornecidos
+  const updatedData = {};
+
+  // Adiciona ao ojeto apenas os campos que existem no req.body e são válidos
+  if (theme !== undefined && possibleThemes.includes(theme.toLowerCase()))
+    updatedData.theme = theme.toLowerCase();
+
+  if (
+    currency !== undefined &&
+    possibleCurrencies.includes(currency.toUpperCase())
+  )
+    updatedData.currency = currency.toUpperCase();
+
+  if (
+    weekStartDay !== undefined &&
+    possibleWeekStartDay.includes(weekStartDay.toLowerCase())
+  )
+    updatedData.weekStartDay = weekStartDay;
+
+  // Se nenhum campo foi fornecido, retorna erro
+  if (Object.keys(updatedData).length == 0) {
+    return res
+      .status(400)
+      .json({ message: "Nenhum dado fornecido / Dados inválidos" });
+  }
+
+  // Atualiza apenas os campos fornecidos
+  const user = await prisma.user.update({
+    where: {
+      id: Number(userId),
+    },
+    data: updatedData,
+  });
+
+  res.status(200).json({ message: "Usuário atualizado com sucesso!", user });
+};
+
+// Loga em uma conta
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  // Verifica se o usuário existe
   const user = await prisma.user.findUnique({
     where: {
       email,
     },
   });
 
+  // Se não existir, retorna erro
   if (!user) {
     return res.status(404).json({ message: "Usuário não encontrado" });
   }
 
+  // Verifica se a senha está correta
   const isPasswordCorrect = await verifyPassword(password, user.passwordHash);
 
+  // Caso não esteja, retorna um erro
   if (!isPasswordCorrect) {
     return res.status(401).json({ message: "Senha incorreta" });
   }
 
+  // Remove a senha do objeto retornado
   const userWithoutPassword = { ...user };
   delete userWithoutPassword.passwordHash;
 
@@ -65,6 +137,7 @@ exports.loginUser = async (req, res) => {
 
 //Retorna todos os usuários
 exports.getUsers = async (req, res) => {
+  // Busca todos os usuários
   const users = await prisma.user.findMany();
 
   res.status(200).json({ users });

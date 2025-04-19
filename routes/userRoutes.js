@@ -12,4 +12,7 @@ router.get("/", userController.getUsers);
 //Rota: POST /users/login
 router.post("/login", userController.loginUser);
 
+//Rota: PUT /users/:id
+router.put("/:userId", userController.updateUser);
+
 module.exports = router;

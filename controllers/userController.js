@@ -15,7 +15,7 @@ const verifyPassword = async (password, passwordHash) => {
   return match;
 };
 
-//Criação do usuário
+// Criação do usuário
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -99,7 +99,14 @@ exports.updateUser = async (req, res) => {
     data: updatedData,
   });
 
-  res.status(200).json({ message: "Usuário atualizado com sucesso!", user });
+  // Cria uma nova cópia sem a senha para retornar
+  const userWithoutPassword = { ...user };
+  delete userWithoutPassword.passwordHash;
+
+  res.status(200).json({
+    message: "Usuário atualizado com sucesso!",
+    user: userWithoutPassword,
+  });
 };
 
 // Loga em uma conta
@@ -135,10 +142,26 @@ exports.loginUser = async (req, res) => {
     .json({ message: "Login realizado com sucesso!", userWithoutPassword });
 };
 
-//Retorna todos os usuários
+// Retorna todos os usuários
 exports.getUsers = async (req, res) => {
   // Busca todos os usuários
   const users = await prisma.user.findMany();
 
   res.status(200).json({ users });
+};
+
+// Retorna um usuário em específico
+exports.getOneUser = async (req, res) => {
+  const { userId } = req.params;
+
+  const user = prisma.user.findUnique({
+    where: {
+      id: Int(userId),
+    },
+  });
+
+  const userWithoutPassword = { ...user };
+  delete userWithoutPassword.passwordHash;
+
+  return res.status(200).json({ user: userWithoutPassword });
 };

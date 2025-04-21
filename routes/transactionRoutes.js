@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const { transactionValidator } = require("../middleware/validator.js");
+const {
+  transactionValidator,
+  validateRequest,
+} = require("../middleware/validator.js");
 const transactionController = require("../controllers/transactionController.js");
 
 // Rota: POST /transaction/:userId/:categoryId
 router.post(
   "/:userId/:categoryId",
   transactionValidator.create,
+  validateRequest,
   transactionController.createTransaction
 );
 
@@ -15,6 +19,7 @@ router.post(
 router.delete(
   "/:userId/:transactionId",
   transactionValidator.delete,
+  validateRequest,
   transactionController.deleteOneTransaction
 );
 
@@ -22,6 +27,7 @@ router.delete(
 router.get(
   "/:userId",
   transactionValidator.get,
+  validateRequest,
   transactionController.getTransactions
 );
 

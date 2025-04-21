@@ -50,6 +50,29 @@ exports.createBudget = async (req, res) => {
     .json({ message: "Orçamento criado com sucesso!", budget });
 };
 
+// Retorna todos os orçamentos de um usuário
+exports.getBudgets = async (req, res) => {
+  const { userId } = req.params;
+
+  if (
+    !(await prisma.user.findUnique({
+      where: {
+        id: Number(userId),
+      },
+    }))
+  ) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
+
+  const budgets = await prisma.budget.findMany({
+    where: {
+      userId: Number(userId),
+    },
+  });
+
+  return res.status(200).json({ budgets });
+};
+
 // Deleta um orçamento
 exports.deleteBudget = async (req, res) => {
   const { budgetId, userId } = req.params;

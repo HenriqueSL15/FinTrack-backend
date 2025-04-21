@@ -1,6 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../middleware/auth.js");
 
 // Criptografa uma senha para a criação de um usuário
 const createCriptographedPassword = async (password) => {
@@ -133,9 +137,28 @@ exports.loginUser = async (req, res) => {
     return res.status(401).json({ message: "Senha incorreta" });
   }
 
+  // Gera tokens de acesso e atualização
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
   // Remove a senha do objeto retornado
   const userWithoutPassword = { ...user };
   delete userWithoutPassword.passwordHash;
+
+  // Define os cookies
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 15 * 60 * 1000, // 15 minutos
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+  });
 
   res
     .status(200)
@@ -152,7 +175,7 @@ exports.getUsers = async (req, res) => {
 
 // Retorna um usuário em específico
 exports.getOneUser = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user?.id || req.params.userId;
 
   const user = prisma.user.findUnique({
     where: {
@@ -160,8 +183,19 @@ exports.getOneUser = async (req, res) => {
     },
   });
 
+  if (!user) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
+
   const userWithoutPassword = { ...user };
   delete userWithoutPassword.passwordHash;
 
   return res.status(200).json({ user: userWithoutPassword });
+};
+
+// Desloga o usuário
+exports.logoutUser = async (req, res) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.status(200).json({ message: "Logout realizado com sucesso!" });
 };

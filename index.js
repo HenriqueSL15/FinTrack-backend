@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
 // const cors = require("cors");
 const userRoutes = require("./routes/userRoutes.js");
 const categoryRoutes = require("./routes/categoryRoutes.js");
@@ -13,8 +14,16 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-// app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
 // Rotas do usuário
 app.use("/users", userRoutes);

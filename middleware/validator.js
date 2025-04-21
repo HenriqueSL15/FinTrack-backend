@@ -14,11 +14,7 @@ const userValidator = {
   create: [
     body("name").notEmpty().withMessage("Nome é obrigatório"),
     body("email").isEmail().withMessage("Email inválido"),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("Senha deve ter pelo menos 8 caracteres")
-      .notEmpty()
-      .withMessage("Senha é obrigatória"),
+    body("password").notEmpty().withMessage("Senha é obrigatória"),
   ],
   update: [
     param("userId").isInt().withMessage("ID de usuário inválido"),
@@ -31,11 +27,7 @@ const userValidator = {
   ],
   login: [
     body("email").isEmail().withMessage("Email inválido"),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("Senha deve ter pelo menos 8 caracteres")
-      .notEmpty()
-      .withMessage("Senha é obrigatória"),
+    body("password").notEmpty().withMessage("Senha é obrigatória"),
   ],
   get: [param("userId").isInt().withMessage("ID de usuário inválido")],
 };

@@ -13,6 +13,9 @@ const {
 } = require("../middleware/validator.js");
 const userController = require("../controllers/userController.js");
 
+// Rota: GET /users/me
+router.get("/me", authenticateUser, userController.getCurrentUser);
+
 // Rota: POST /users
 router.post(
   "/",

@@ -58,6 +58,10 @@
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
+    // Campo opicional para identificar o objetivo relacionado
+    goalId Int? @map("goal_id")
+    goal Goal? @relation(fields: [goalId], references: [id])
+
     //Relações
     userId Int @map("user_id")
     user User @relation(fields: [userId], references: [id])
@@ -97,6 +101,8 @@
     //Relações
     userId Int @map("user_id")
     user User @relation(fields: [userId], references: [id])
+
+    transactions Transaction[]
 
     @@map("goals")
   }

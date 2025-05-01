@@ -22,7 +22,7 @@ const verifyPassword = async (password, passwordHash) => {
 // Criação do usuário
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
-
+  console.log("está funcionando");
   // Verifica se o usuário já existe
   const userExists = await prisma.user.findUnique({
     where: {
@@ -191,6 +191,28 @@ exports.getOneUser = async (req, res) => {
   delete userWithoutPassword.passwordHash;
 
   return res.status(200).json({ user: userWithoutPassword });
+};
+
+// Obtem usuário atual
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Remove sensitive data
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.passwordHash;
+
+    return res.status(200).json({ user: userWithoutPassword });
+  } catch (err) {
+    console.error("Error fetching current user:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 };
 
 // Desloga o usuário

@@ -60,6 +60,7 @@ const goalValidator = {
     param("userId").isInt().withMessage("ID de usuário inválido"),
     param("goalId").isInt().withMessage("ID de objetivo inválido"),
   ],
+  get: [param("userId").isInt().withMessage("ID de usuário inválido")],
 };
 
 // Validadores para categorias

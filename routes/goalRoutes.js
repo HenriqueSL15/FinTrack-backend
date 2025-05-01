@@ -15,6 +15,14 @@ router.post(
   goalController.createGoal
 );
 
+// Rota: GET /goal/:userId
+router.get(
+  "/:userId",
+  goalValidator.get,
+  validateRequest,
+  goalController.getGoals
+);
+
 // Rota: DELETE /goal/:userId/:goalId
 router.delete(
   "/:userId/:goalId",

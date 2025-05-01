@@ -40,6 +40,19 @@ exports.createGoal = async (req, res) => {
     .json({ message: "Objetivo criado com sucesso!", goal });
 };
 
+// Retorna todos os objetivos de um usuário
+exports.getGoals = async (req, res) => {
+  const { userId } = req.params;
+
+  const goals = await prisma.goal.findMany({
+    where: {
+      id: Number(userId),
+    },
+  });
+
+  return res.status(200).json({ goals });
+};
+
 // Deleta o objetivo de um usuário
 exports.deleteGoal = async (req, res) => {
   const { goalId, userId } = req.params;

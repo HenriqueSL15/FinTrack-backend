@@ -22,7 +22,7 @@ const verifyPassword = async (password, passwordHash) => {
 // Criação do usuário
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
-  console.log("está funcionando");
+
   // Verifica se o usuário já existe
   const userExists = await prisma.user.findUnique({
     where: {
@@ -44,6 +44,15 @@ exports.createUser = async (req, res) => {
       name,
       email,
       passwordHash,
+    },
+  });
+
+  // Criação da categoria OBJETIVOS padrão
+  const goalCategory = await prisma.category.create({
+    data: {
+      name: "Objetivos",
+      type: "goal",
+      userId: user.id,
     },
   });
 

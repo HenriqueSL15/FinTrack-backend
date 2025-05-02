@@ -16,9 +16,9 @@ const userController = require("../controllers/userController.js");
 // Rota: GET /users/me
 router.get("/me", authenticateUser, userController.getCurrentUser);
 
-// Rota: POST /users
+// Rota: POST /users/register
 router.post(
-  "/",
+  "/register",
   userValidator.create,
   validateRequest,
   userController.createUser

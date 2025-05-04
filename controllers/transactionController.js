@@ -126,6 +126,13 @@ exports.getTransactions = async (req, res) => {
     where: {
       userId: Number(userId),
     },
+    include: {
+      category: true,
+      goal: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return res.status(200).json({ transactions });

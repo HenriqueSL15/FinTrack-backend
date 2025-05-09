@@ -68,6 +68,9 @@ exports.getBudgets = async (req, res) => {
     where: {
       userId: Number(userId),
     },
+    include: {
+      category: true,
+    },
   });
 
   return res.status(200).json({ budgets });

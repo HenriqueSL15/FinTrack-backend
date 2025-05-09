@@ -80,7 +80,11 @@ const categoryValidator = {
 // Validadores para orçamentos
 const budgetValidator = {
   create: [
-    body("monthYear").isDate().withMessage("Data inválida"),
+    body("monthYear")
+      .custom((value) => {
+        return !isNaN(Date.parse(value));
+      })
+      .withMessage("Data inválida"),
     body("limitAmount").isFloat().withMessage("Valor inválido"),
     param("userId").isInt().withMessage("ID de usuário inválido"),
     param("categoryId").isInt().withMessage("ID de categoria inválido"),

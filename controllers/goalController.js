@@ -46,10 +46,10 @@ exports.getGoals = async (req, res) => {
 
   const goals = await prisma.goal.findMany({
     where: {
-      id: Number(userId),
+      userId: Number(userId),
     },
   });
-
+  console.log(goals);
   return res.status(200).json({ goals });
 };
 

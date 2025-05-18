@@ -53,7 +53,7 @@ const goalValidator = {
   create: [
     body("description").notEmpty().withMessage("Descrição é obrigatória"),
     body("targetAmount").isFloat().withMessage("Valor inválido"),
-    body("targetDate").isDate().withMessage("Data inválida"),
+    body("targetDate").isString().withMessage("Data inválida"),
     param("userId").isInt().withMessage("ID de usuário inválido"),
   ],
   delete: [

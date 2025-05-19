@@ -23,6 +23,14 @@ router.get(
   goalController.getGoals
 );
 
+// Rota: PUT /goal/:userId/:goalId
+router.put(
+  "/:userId/:goalId",
+  goalValidator.update,
+  validateRequest,
+  goalController.updateGoal
+);
+
 // Rota: DELETE /goal/:userId/:goalId
 router.delete(
   "/:userId/:goalId",

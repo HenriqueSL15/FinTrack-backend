@@ -60,6 +60,17 @@ const goalValidator = {
     param("userId").isInt().withMessage("ID de usuário inválido"),
     param("goalId").isInt().withMessage("ID de objetivo inválido"),
   ],
+  update: [
+    param("userId").isInt().withMessage("ID de usuário inválido"),
+    param("goalId").isInt().withMessage("ID de objetivo inválido"),
+    body("description")
+      .optional()
+      .notEmpty()
+      .withMessage("Descrição é obrigatória"),
+    body("targetAmount").optional().isFloat().withMessage("Valor inválido"),
+    body("currentAmount").optional().isFloat().withMessage("Valor inválido"),
+    body("targetDate").optional().isString().withMessage("Data inválida"),
+  ],
   get: [param("userId").isInt().withMessage("ID de usuário inválido")],
 };
 

@@ -67,13 +67,10 @@ exports.createUser = async (req, res) => {
 // Atualização do usuário
 exports.updateUser = async (req, res) => {
   const { userId } = req.params;
-  const { theme, currency, weekStartDay } = req.body;
+  const { theme, currency } = req.body;
 
   // Possíveis temas para update
   const possibleThemes = ["light", "dark", "system"];
-
-  // Possíveis opções de início de semana
-  const possibleWeekStartDay = ["monday", "sunday"];
 
   // Possíveis opções de moeda
   const possibleCurrencies = ["BRL", "USD", "EUR"];
@@ -90,12 +87,6 @@ exports.updateUser = async (req, res) => {
     possibleCurrencies.includes(currency.toUpperCase())
   )
     updatedData.currency = currency.toUpperCase();
-
-  if (
-    weekStartDay !== undefined &&
-    possibleWeekStartDay.includes(weekStartDay.toLowerCase())
-  )
-    updatedData.weekStartDay = weekStartDay;
 
   // Se nenhum campo foi fornecido, retorna erro
   if (Object.keys(updatedData).length == 0) {

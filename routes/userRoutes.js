@@ -27,7 +27,7 @@ router.post(
 // Rota: GET /users
 router.get("/", userController.getUsers);
 
-// Rota: GET /user/:userId
+// Rota: GET /users/:userId
 router.get(
   "/:userId",
   authenticateUser,

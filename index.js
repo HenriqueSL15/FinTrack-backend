@@ -1,5 +1,10 @@
+if (process.env.NODE_ENV === "test") {
+  require("dotenv").config({ path: ".env.test" });
+} else {
+  require("dotenv").config();
+}
+
 const express = require("express");
-require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes.js");
@@ -42,5 +47,9 @@ app.use("/goal", goalRoutes);
 
 app.use(errorHandler);
 
-// Iniciar servidor
-app.listen(port, () => console.log("Servidor está sendo executado!", port));
+module.exports = app;
+
+// Iniciar servidor apenas se não estiver em aibmente de teste
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => console.log("Servidor está sendo executado!", port));
+}

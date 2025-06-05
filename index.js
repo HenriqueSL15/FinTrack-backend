@@ -1,8 +1,8 @@
-if (process.env.NODE_ENV === "test") {
-  require("dotenv").config({ path: ".env.test" });
-} else {
-  require("dotenv").config();
-}
+// if (process.env.NODE_ENV === "test") {
+//   require("dotenv").config({ path: ".env.test" });
+// } else {
+//   require("dotenv").config();
+// }
 
 const express = require("express");
 const cookieParser = require("cookie-parser");

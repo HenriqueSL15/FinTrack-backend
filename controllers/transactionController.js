@@ -43,6 +43,28 @@ exports.createTransaction = async (req, res) => {
           throw new Error("Objetivo não encontrado");
         }
 
+        // Verifica se o usuário existe
+        const user = await tx.user.findUnique({
+          where: {
+            id: Number(userId),
+          },
+        });
+
+        if (!user) {
+          throw new Error("Usuário não encontrado");
+        }
+
+        // Verifica se a categoria existe
+        const category = await tx.category.findUnique({
+          where: {
+            id: Number(categoryId),
+          },
+        });
+
+        if (!category) {
+          throw new Error("Categoria não encontrada");
+        }
+
         // Cria a transação
         const transaction = await tx.transaction.create({
           data: {
@@ -78,6 +100,28 @@ exports.createTransaction = async (req, res) => {
         goal: result.updatedGoal,
       });
     } else {
+      // Verifica se o usuário existe
+      if (
+        !(await prisma.user.findUnique({
+          where: {
+            id: Number(userId),
+          },
+        }))
+      ) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Verifica se a categoria existe
+      if (
+        !(await prisma.category.findUnique({
+          where: {
+            id: Number(categoryId),
+          },
+        }))
+      ) {
+        return res.status(404).json({ message: "Categoria não encontrada" });
+      }
+
       // Cria a transação
       const transaction = await prisma.transaction.create({
         data: {
@@ -121,6 +165,17 @@ exports.deleteOneTransaction = async (req, res) => {
 // Retorna todas as transações de um usuário
 exports.getTransactions = async (req, res) => {
   const { userId } = req.params;
+
+  // Verifica se o usuário existe
+  if (
+    !(await prisma.user.findUnique({
+      where: {
+        id: Number(userId),
+      },
+    }))
+  ) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
 
   const transactions = await prisma.transaction.findMany({
     where: {

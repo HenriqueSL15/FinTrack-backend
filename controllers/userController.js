@@ -23,6 +23,9 @@ const verifyPassword = async (password, passwordHash) => {
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
+  if (!name || !email || !password)
+    return res.status(400).json({ message: "Preencha todos os campos" });
+
   // Verifica se o usuário já existe
   const userExists = await prisma.user.findUnique({
     where: {
@@ -78,15 +81,23 @@ exports.updateUser = async (req, res) => {
   // Cria um ojeto de dados apenas com os campos que foram fornecidos
   const updatedData = {};
 
-  // Adiciona ao ojeto apenas os campos que existem no req.body e são válidos
+  // Adiciona ao objeto apenas os campos que existem no req.body e são válidos
   if (theme !== undefined && possibleThemes.includes(theme.toLowerCase()))
     updatedData.theme = theme.toLowerCase();
+
+  if (!possibleThemes.includes(theme.toLowerCase())) {
+    return res.status(400).json({ message: "Tema inválido" });
+  }
 
   if (
     currency !== undefined &&
     possibleCurrencies.includes(currency.toUpperCase())
   )
     updatedData.currency = currency.toUpperCase();
+
+  if (!possibleCurrencies.includes(currency.toUpperCase())) {
+    return res.status(400).json({ message: "Moeda inválida" });
+  }
 
   // Se nenhum campo foi fornecido, retorna erro
   if (Object.keys(updatedData).length == 0) {
@@ -175,11 +186,11 @@ exports.getUsers = async (req, res) => {
 
 // Retorna um usuário em específico
 exports.getOneUser = async (req, res) => {
-  const userId = req.user?.id || req.params.userId;
+  const userId = req.user.id;
 
   const user = prisma.user.findUnique({
     where: {
-      id: Int(userId),
+      id: Number(userId),
     },
   });
 

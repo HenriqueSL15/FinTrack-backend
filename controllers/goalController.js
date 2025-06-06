@@ -44,6 +44,16 @@ exports.createGoal = async (req, res) => {
 exports.getGoals = async (req, res) => {
   const { userId } = req.params;
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: Number(userId),
+    },
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
+
   const goals = await prisma.goal.findMany({
     where: {
       userId: Number(userId),

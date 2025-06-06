@@ -77,6 +77,18 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategories = async (req, res) => {
   const { userId } = req.params;
 
+  if (!userId)
+    return res.status(400).json({ message: "Preencha todos os campos" });
+
+  //Verifica se o usuário existe
+  const user = await prisma.user.findUnique({
+    where: {
+      id: Number(userId),
+    },
+  });
+
+  if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+
   // Obtem todas as categorias
   const categories = await prisma.category.findMany({
     where: {

@@ -26,7 +26,7 @@ exports.generateRefreshToken = (user) => {
 };
 
 // Middleware para verificar se o usuário está autenticado
-exports.authenticateUser = (req, res, next) => {
+exports.authenticateUser = async (req, res, next) => {
   const token = req.cookies.accessToken;
 
   if (!token) {
@@ -35,6 +35,16 @@ exports.authenticateUser = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Verifica se o usuário existe no banco
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
     req.user = decoded;
     next();
   } catch (error) {

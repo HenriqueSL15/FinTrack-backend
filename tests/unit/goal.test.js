@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../index");
+const app = require("../../index");
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();

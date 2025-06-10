@@ -84,6 +84,22 @@ exports.updateGoal = async (req, res) => {
     return res.status(404).json({ message: "Objetivo não encontrado" });
   }
 
+  // Verifica se o usuário existe
+  if (
+    !(await prisma.user.findUnique({
+      where: {
+        id: Number(userId),
+      },
+    }))
+  ) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
+
+  // Verifica se o targetAmount é um número
+  if (typeof targetAmount !== "number" && typeof Number(targetAmount) === NaN) {
+    return res.status(400).json({ message: "Valor inválido" });
+  }
+
   // Verifica se algo foi alterado
   const isEverythingEqual =
     goal.description === description &&

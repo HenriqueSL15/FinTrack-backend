@@ -78,7 +78,7 @@ app.use(errorHandler);
 module.exports = app;
 
 // Iniciar servidor apenas se não estiver em aibmente de teste
-if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+if (process.env.NODE_ENV !== "test") {
   app.listen(port, () =>
     console.log("Servidor está sendo executado na porta", port)
   );

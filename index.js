@@ -79,7 +79,5 @@ module.exports = app;
 
 // Iniciar servidor apenas se não estiver em aibmente de teste
 if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () =>
-    console.log("Servidor está sendo executado na porta", port)
-  );
+  app.listen(port, () => console.log("Servidor está sendo executado!", port));
 }

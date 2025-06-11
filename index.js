@@ -34,6 +34,20 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/env-check", (req, res) => {
+  res.json({
+    nodeEnv: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+    isDevelopment: process.env.NODE_ENV === "development",
+    isProduction: process.env.NODE_ENV === "production",
+    isTest: process.env.NODE_ENV === "test",
+    cookieSettings: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    },
+  });
+});
+
 // Rotas do usuário
 app.use("/users", userRoutes);
 

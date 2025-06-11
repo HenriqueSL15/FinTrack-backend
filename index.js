@@ -48,6 +48,15 @@ app.get("/env-check", (req, res) => {
   });
 });
 
+// Rota raiz para verificar se o servidor está funcionando
+app.get("/", (req, res) => {
+  res.json({
+    message: "FinTrack API está funcionando!",
+    version: "1.0.0",
+    environment: process.env.NODE_ENV,
+  });
+});
+
 // Rotas do usuário
 app.use("/users", userRoutes);
 

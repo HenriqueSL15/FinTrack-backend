@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test jest",
-    "start": "npx prisma generate && nodemon index.js"
+    "start": "npx prisma generate && nodemon index.js",
+    "build": "prisma generate"
   },
   "keywords": [],
   "author": "",

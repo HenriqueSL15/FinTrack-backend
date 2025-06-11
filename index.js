@@ -4,6 +4,7 @@ if (process.env.NODE_ENV === "test") {
   // através do setupTests.js, então não fazemos nada aqui
 } else if (process.env.NODE_ENV === "production") {
   require("dotenv").config({ path: ".env.production" });
+  process.env.NODE_ENV = "production";
 } else {
   require("dotenv").config(); // Carrega o .env padrão para desenvolvimento
 }
@@ -77,6 +78,8 @@ app.use(errorHandler);
 module.exports = app;
 
 // Iniciar servidor apenas se não estiver em aibmente de teste
-if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => console.log("Servidor está sendo executado!", port));
+if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+  app.listen(port, () =>
+    console.log("Servidor está sendo executado na porta", port)
+  );
 }

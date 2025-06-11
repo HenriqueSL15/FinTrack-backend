@@ -1,3 +1,13 @@
+// Carrega o arquivo .env apropriado
+if (process.env.NODE_ENV === "test") {
+  // Durante testes, o .env.test já deve ter sido carregado pelo Jest
+  // através do setupTests.js, então não fazemos nada aqui
+} else if (process.env.NODE_ENV === "production") {
+  require("dotenv").config({ path: ".env.production" });
+} else {
+  require("dotenv").config(); // Carrega o .env padrão para desenvolvimento
+}
+
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -15,7 +25,7 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],

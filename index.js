@@ -25,7 +25,7 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(
   cors({
-    origin: ["https://fintrackbr.netlify.app", "http://localhost:5173"],
+    origin: "https://fintrackbr.netlify.app",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],

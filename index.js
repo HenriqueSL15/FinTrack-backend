@@ -16,6 +16,8 @@ const categoryRoutes = require("./routes/categoryRoutes.js");
 const transactionRoutes = require("./routes/transactionRoutes.js");
 const budgetRoutes = require("./routes/budgetRoutes.js");
 const goalRoutes = require("./routes/goalRoutes.js");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const errorHandler = require("./middleware/errorHandler.js");
 

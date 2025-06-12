@@ -1,107 +1,87 @@
-  // This is your Prisma schema file,
-  // learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
-  // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-  // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  generator client {
-    provider = "prisma-client-js"
-  }
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  theme        String        @default("system")
+  currency     String        @default("BRL")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  budgets      Budget[]
+  categories   Category[]
+  goals        Goal[]
+  transactions Transaction[]
 
-  datasource db {
-    provider = "postgresql"
-    url      =  env("DATABASE_URL")
-  }
+  @@map("users")
+}
 
-  model User {
-    id Int @id @default(autoincrement())
-    name String
-    email String @unique
-    passwordHash String @map("password_hash")
-    theme String @default("system")
-    currency String @default("BRL")
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
+model Category {
+  id           Int           @id @default(autoincrement())
+  name         String
+  type         String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  userId       Int           @map("user_id")
+  budgets      Budget[]
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
 
-    //Relações
-    transactions Transaction[]
-    categories Category[]
-    budgets Budget[]
-    goals Goal[]
+  @@map("categories")
+}
 
-    @@map("users")
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  description String
+  amount      Float
+  type        String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId      Int      @map("user_id")
+  categoryId  Int      @map("category_id")
+  goalId      Int?     @map("goal_id")
+  category    Category @relation(fields: [categoryId], references: [id])
+  goal        Goal?    @relation(fields: [goalId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
-  }
+  @@map("transactions")
+}
 
-  model Category {
-    id Int @id @default(autoincrement())
-    name String
-    type String
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
+model Budget {
+  id          Int      @id @default(autoincrement())
+  monthYear   DateTime @map("month_year")
+  limitAmount Float    @map("limit_amount")
+  spentAmount Float    @default(0) @map("spent_amount")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId      Int      @map("user_id")
+  categoryId  Int      @map("category_id")
+  category    Category @relation(fields: [categoryId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
-    //Relações
-    userId Int @map("user_id")  
-    user User @relation(fields: [userId], references: [id])
-    transactions Transaction[]
-    budgets Budget[]
+  @@map("budgets")
+}
 
-    @@map("categories")
-  }
+model Goal {
+  id            Int           @id @default(autoincrement())
+  description   String
+  targetAmount  Float         @map("target_amount")
+  currentAmount Float         @default(0) @map("current_amount")
+  targetDate    DateTime      @map("target_date")
+  status        String        @default("active")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  userId        Int           @map("user_id")
+  user          User          @relation(fields: [userId], references: [id])
+  transactions  Transaction[]
 
-  model Transaction {
-    id Int @id @default(autoincrement())
-    description String
-    amount Float
-    type String
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
-
-    // Campo opicional para identificar o objetivo relacionado
-    goalId Int? @map("goal_id")
-    goal Goal? @relation(fields: [goalId], references: [id])
-
-    //Relações
-    userId Int @map("user_id")
-    user User @relation(fields: [userId], references: [id])
-    categoryId Int @map("category_id")
-    category Category @relation(fields: [categoryId], references: [id])
-
-    @@map("transactions")
-  }
-
-  model Budget {
-    id Int @id @default(autoincrement())
-    monthYear DateTime @map("month_year")
-    limitAmount Float @map("limit_amount")
-    spentAmount Float @default(0) @map("spent_amount")
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
-
-    //Relações
-    userId Int @map("user_id")
-    user User @relation(fields: [userId], references: [id])
-    categoryId Int @map("category_id")
-    category Category @relation(fields: [categoryId], references: [id])
-
-    @@map("budgets")
-  }
-
-  model Goal{
-    id Int @id @default(autoincrement())
-    description String
-    targetAmount Float @map("target_amount")
-    currentAmount Float @default(0) @map("current_amount")
-    targetDate DateTime @map("target_date")
-    status String @default("active")
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
-
-    //Relações
-    userId Int @map("user_id")
-    user User @relation(fields: [userId], references: [id])
-
-    transactions Transaction[]
-
-    @@map("goals")
-  }
+  @@map("goals")
+}

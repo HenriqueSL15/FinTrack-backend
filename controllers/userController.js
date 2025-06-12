@@ -72,6 +72,8 @@ exports.updateUser = async (req, res) => {
   const { userId } = req.params;
   const { theme, currency } = req.body;
 
+  console.log("Dados recebidos:", req.body);
+
   // Possíveis temas para update
   const possibleThemes = ["light", "dark", "system"];
 

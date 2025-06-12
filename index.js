@@ -4,7 +4,6 @@ if (process.env.NODE_ENV === "test") {
   // através do setupTests.js, então não fazemos nada aqui
 } else if (process.env.NODE_ENV === "production") {
   require("dotenv").config({ path: ".env.production" });
-  process.env.NODE_ENV = "production";
 } else {
   require("dotenv").config(); // Carrega o .env padrão para desenvolvimento
 }

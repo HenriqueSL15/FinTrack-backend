@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "rewrites": [{ "source": "/webhook", "destination": "api/webhook.py" }],
   "builds": [
     {
       "src": "index.js",

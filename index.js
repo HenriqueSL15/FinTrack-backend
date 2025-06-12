@@ -36,20 +36,6 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/env-check", (req, res) => {
-  res.json({
-    nodeEnv: process.env.NODE_ENV,
-    frontendUrl: process.env.FRONTEND_URL,
-    isDevelopment: process.env.NODE_ENV === "development",
-    isProduction: process.env.NODE_ENV === "production",
-    isTest: process.env.NODE_ENV === "test",
-    cookieSettings: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    },
-  });
-});
-
 app.get("/test-db-connection", async (req, res) => {
   try {
     // Tenta fazer uma consulta simples

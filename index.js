@@ -48,6 +48,26 @@ app.get("/env-check", (req, res) => {
   });
 });
 
+app.get("/test-db-connection", async (req, res) => {
+  try {
+    // Tenta fazer uma consulta simples
+    const result = await prisma.$queryRaw`SELECT 1 as test`;
+    res.json({
+      success: true,
+      message: "Conexão com o banco de dados estabelecida com sucesso",
+      result,
+    });
+  } catch (error) {
+    console.error("Erro ao conectar ao banco de dados:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erro ao conectar ao banco de dados",
+      error: error.message,
+      stack: process.env.NODE_ENV === "production" ? null : error.stack,
+    });
+  }
+});
+
 // Rota raiz para verificar se o servidor está funcionando
 app.get("/", (req, res) => {
   res.json({

@@ -23,6 +23,8 @@ const verifyPassword = async (password, passwordHash) => {
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
+  console.log("Dados recebidos:", req.body);
+
   if (!name || !email || !password)
     return res.status(400).json({ message: "Preencha todos os campos" });
 
@@ -71,8 +73,6 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   const { userId } = req.params;
   const { theme, currency } = req.body;
-
-  console.log("Dados recebidos:", req.body);
 
   // Possíveis temas para update
   const possibleThemes = ["light", "dark", "system"];

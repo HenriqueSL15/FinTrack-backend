@@ -24,6 +24,8 @@ const errorHandler = require("./middleware/errorHandler.js");
 const app = express();
 const port = process.env.PORT || 3000;
 
+console.log("DB_URL atual:", process.env.DATABASE_URL);
+
 // Middleware
 app.use(
   cors({

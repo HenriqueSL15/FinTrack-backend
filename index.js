@@ -24,8 +24,6 @@ const errorHandler = require("./middleware/errorHandler.js");
 const app = express();
 const port = process.env.PORT || 3000;
 
-console.log("DB_URL atual:", process.env.DATABASE_URL);
-
 // Middleware
 app.use(
   cors({
@@ -39,6 +37,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/test-db-connection", async (req, res) => {
+  console.log("DB_URL atual:", process.env.DATABASE_URL);
   try {
     // Tenta fazer uma consulta simples
     const result = await prisma.$queryRaw`SELECT 1 as test`;

@@ -81,11 +81,25 @@ app.use("/budget", budgetRoutes);
 // Rotas de objetivo
 app.use("/goal", goalRoutes);
 
+// Rota de teste para limpar o banco de dados
+app.post("/test/clean", async (req, res) => {
+  try {
+    await prisma.transaction.deleteMany();
+    await prisma.budget.deleteMany();
+    await prisma.goal.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
+    res.status(200).json({ message: "Banco de dados limpo com sucesso!" });
+  } catch (err) {
+    console.error("Erro ao limpar banco de dados:", err);
+  }
+});
+
 app.use(errorHandler);
 
 module.exports = app;
 
-// Iniciar servidor apenas se não estiver em aibmente de teste
+// Iniciar servidor apenas se não estiver em ambiente de teste
 if (process.env.NODE_ENV !== "test") {
   app.listen(port, () => console.log("Servidor está sendo executado!", port));
 }

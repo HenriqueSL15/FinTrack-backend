@@ -4,7 +4,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 beforeEach(async () => {
-  if (!process.env.DATABASE_URL.includes("test")) {
+  console.log("DB_URL atual:", process.env.DATABASE_URL);
+  if (!process.env.DATABASE_URL.includes("@ep-dark-sunset-accun349-pooler")) {
     throw new Error("NUNCA rode testes em banco de produção/desenvolvimento!");
   }
   await prisma.transaction.deleteMany();

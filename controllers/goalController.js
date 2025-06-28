@@ -132,8 +132,8 @@ exports.updateGoal = async (req, res) => {
       description: data.description,
       amount: data.currentAmount - goal.currentAmount,
       type: "goal",
-      userId,
-      goalId,
+      userId: Number(userId),
+      goalId: Number(goalId),
     },
   });
 

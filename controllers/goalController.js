@@ -126,6 +126,17 @@ exports.updateGoal = async (req, res) => {
         : goal.targetDate,
   };
 
+  // Cria transação de tipo Goal
+  const goalTransaction = await prisma.transaction.create({
+    data: {
+      description: data.description,
+      amount: data.currentAmount - goal.currentAmount,
+      type: "goal",
+      userId,
+      goalId,
+    },
+  });
+
   // Atualiza o objetivo
   const updatedGoal = await prisma.goal.update({
     where: {
@@ -141,6 +152,7 @@ exports.updateGoal = async (req, res) => {
   return res.status(200).json({
     message: "Objetivo atualizado com sucesso!",
     goal: updatedGoal,
+    goalTransaction,
   });
 };
 

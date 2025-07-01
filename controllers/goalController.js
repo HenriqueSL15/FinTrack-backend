@@ -66,7 +66,8 @@ exports.getGoals = async (req, res) => {
 // Atualiza um objetivo de um usuário
 exports.updateGoal = async (req, res) => {
   const { goalId, userId } = req.params;
-  const { description, targetAmount, currentAmount, targetDate } = req.body;
+  const { description, targetAmount, currentAmount, targetDate, balance } =
+    req.body;
 
   // Procura o objetivo
   const goal = await prisma.goal.findUnique({
@@ -110,6 +111,10 @@ exports.updateGoal = async (req, res) => {
   // Se nada foi alterado, retorna erro
   if (isEverythingEqual) {
     return res.status(400).json({ message: "Nada foi alterado" });
+  }
+
+  if (balance < currentAmount) {
+    return res.status(404).json({ message: "Saldo indisponível" });
   }
 
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado

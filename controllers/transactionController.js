@@ -28,115 +28,42 @@ exports.createTransaction = async (req, res) => {
   }
 
   try {
-    // Se for uma transação para objetivo, usa uma transação do Prisma para garantir consistência
-    if (type.toLowerCase() === "goal") {
-      const result = await prisma.$transaction(async (tx) => {
-        // Verifica se o objetivo existe
-        const goal = await tx.goal.findUnique({
-          where: {
-            id: Number(goalId),
-            userId: Number(userId),
-          },
-        });
-
-        if (!goal) {
-          throw new Error("Objetivo não encontrado");
-        }
-
-        // Verifica se o usuário existe
-        const user = await tx.user.findUnique({
-          where: {
-            id: Number(userId),
-          },
-        });
-
-        if (!user) {
-          throw new Error("Usuário não encontrado");
-        }
-
-        // Verifica se a categoria existe
-        const category = await tx.category.findUnique({
-          where: {
-            id: Number(categoryId),
-          },
-        });
-
-        if (!category) {
-          throw new Error("Categoria não encontrada");
-        }
-
-        // Cria a transação
-        const transaction = await tx.transaction.create({
-          data: {
-            description,
-            amount: Number(amount),
-            type: type.toLowerCase(),
-            userId: Number(userId),
-            categoryId: Number(categoryId),
-            goalId: Number(goalId),
-          },
-        });
-
-        // Atualiza o valor atual do objetivo
-        const updatedGoal = await tx.goal.update({
-          where: {
-            id: Number(goalId),
-          },
-          data: {
-            currentAmount: goal.currentAmount + Number(amount),
-            status:
-              goal.currentAmount + Number(amount) >= goal.targetAmount
-                ? "completed"
-                : goal.status,
-          },
-        });
-
-        return { transaction, updatedGoal };
-      });
-
-      return res.status(201).json({
-        message: "Transação para objetivo criada com sucesso!",
-        transaction: result.transaction,
-        goal: result.updatedGoal,
-      });
-    } else {
-      // Verifica se o usuário existe
-      if (
-        !(await prisma.user.findUnique({
-          where: {
-            id: Number(userId),
-          },
-        }))
-      ) {
-        return res.status(404).json({ message: "Usuário não encontrado" });
-      }
-
-      // Verifica se a categoria existe
-      if (
-        !(await prisma.category.findUnique({
-          where: {
-            id: Number(categoryId),
-          },
-        }))
-      ) {
-        return res.status(404).json({ message: "Categoria não encontrada" });
-      }
-
-      // Cria a transação
-      const transaction = await prisma.transaction.create({
-        data: {
-          description,
-          amount,
-          type: type.toLowerCase(),
-          userId: Number(userId),
-          categoryId: Number(categoryId),
+    // Verifica se o usuário existe
+    if (
+      !(await prisma.user.findUnique({
+        where: {
+          id: Number(userId),
         },
-      });
-
-      res
-        .status(201)
-        .json({ message: "Transação criada com sucesso!", transaction });
+      }))
+    ) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
     }
+
+    // Verifica se a categoria existe
+    if (
+      !(await prisma.category.findUnique({
+        where: {
+          id: Number(categoryId),
+        },
+      }))
+    ) {
+      return res.status(404).json({ message: "Categoria não encontrada" });
+    }
+
+    // Cria a transação
+    const transaction = await prisma.transaction.create({
+      data: {
+        description,
+        amount,
+        type: type.toLowerCase(),
+        userId: Number(userId),
+        categoryId: Number(categoryId),
+      },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Transação criada com sucesso!", transaction });
   } catch (err) {
     console.error("Erro ao criar transação:", err);
     return res.status(500).json({

@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 // Cria nova transação
 exports.createTransaction = async (req, res) => {
-  const { description, amount, type, goalId } = req.body;
+  const { description, amount, type, date, goalId } = req.body;
   const { userId, categoryId } = req.params;
 
   // Verifica se algum campo está vazio
@@ -58,6 +58,7 @@ exports.createTransaction = async (req, res) => {
         type: type.toLowerCase(),
         userId: Number(userId),
         categoryId: Number(categoryId),
+        date: new Date(date),
       },
     });
 

@@ -44,6 +44,7 @@ model Transaction {
   description String
   amount      Float
   type        String
+  date        DateTime
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   userId      Int      @map("user_id")

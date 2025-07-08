@@ -66,8 +66,14 @@ exports.getGoals = async (req, res) => {
 // Atualiza um objetivo de um usuário
 exports.updateGoal = async (req, res) => {
   const { goalId, userId } = req.params;
-  const { description, targetAmount, currentAmount, targetDate, balance } =
-    req.body;
+  const {
+    description,
+    targetAmount,
+    currentAmount,
+    targetDate,
+    balance,
+    date,
+  } = req.body;
 
   // Procura o objetivo
   const goal = await prisma.goal.findUnique({
@@ -139,6 +145,7 @@ exports.updateGoal = async (req, res) => {
       type: "goal",
       userId: Number(userId),
       goalId: Number(goalId),
+      date,
     },
   });
 

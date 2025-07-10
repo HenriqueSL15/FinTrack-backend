@@ -145,7 +145,7 @@ exports.updateGoal = async (req, res) => {
       type: "goal",
       userId: Number(userId),
       goalId: Number(goalId),
-      date,
+      date: new Date(date),
     },
   });
 

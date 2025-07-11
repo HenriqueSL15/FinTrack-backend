@@ -69,6 +69,8 @@ exports.updateGoal = async (req, res) => {
   const { description, targetAmount, currentAmount, targetDate, balance } =
     req.body;
 
+  console.log(description, targetAmount, currentAmount, targetDate, balance);
+
   // Procura o objetivo
   const goal = await prisma.goal.findUnique({
     where: {
@@ -117,23 +119,24 @@ exports.updateGoal = async (req, res) => {
     return res.status(400).json({ message: "Saldo indisponível" });
   }
 
+  if (currentAmount < goal.currentAmount) {
+    return res.status(404).json({ message: "Valor baixo" });
+  }
+
+  const amount = currentAmount - goal.currentAmount;
+  if (typeof amount !== "number" || isNaN(amount)) {
+    return res.status(400).json({ message: "Valor de amount inválido" });
+  }
+
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado
   const data = {
     description:
       description != goal.description ? description : goal.description,
     targetAmount:
       targetAmount != goal.targetAmount ? targetAmount : goal.targetAmount,
+    currentAmount,
     targetDate,
   };
-
-  if (currentAmount < goal.currentAmount) {
-    return res.status(404).json({ message: "Valor baixo" });
-  }
-  console.log(currentAmount, goal.currentAmount);
-  const amount = currentAmount - goal.currentAmount;
-  if (typeof amount !== "number" || isNaN(amount)) {
-    return res.status(400).json({ message: "Valor de amount inválido" });
-  }
 
   // Cria transação de tipo Goal
   const goalTransaction = await prisma.transaction.create({

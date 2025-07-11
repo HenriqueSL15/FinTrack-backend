@@ -63,6 +63,7 @@ describe("Goal integration tests", () => {
         description: "Viagem",
         targetAmount: 5000,
         targetDate: "2025-01-01T00:00:00.000Z",
+        date: "01-01-2025",
       });
 
     // Atualização do objetivo
@@ -73,7 +74,9 @@ describe("Goal integration tests", () => {
       .send({
         description: "Viagem",
         targetAmount: 10000,
+        currentAmount: 1000,
         targetDate: "2025-01-01T00:00:00.000Z",
+        date: "01-01-2025",
       });
 
     expect(updateRes.statusCode).toBe(200);
@@ -97,6 +100,7 @@ describe("Goal integration tests", () => {
         description: "Viagem",
         targetAmount: 5000,
         targetDate: "2025-01-01T00:00:00.000Z",
+        date: "01-01-2025",
       });
 
     // Atualização do objetivo
@@ -108,6 +112,7 @@ describe("Goal integration tests", () => {
         description: "Viagem",
         targetAmount: "fasdfasdf",
         targetDate: "2025-01-01T00:00:00.000Z",
+        date: "01-01-2025",
       });
 
     expect(updateRes.statusCode).toBe(400);

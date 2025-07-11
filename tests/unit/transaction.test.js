@@ -27,7 +27,12 @@ describe("Transaction endpoints", () => {
     it("SUCESSO - cria transação", async () => {
       const res = await request(app)
         .post(`/transaction/${userId}/${categoryId}`)
-        .send({ description: "Salário", amount: 1000, type: "income" });
+        .send({
+          description: "Salário",
+          amount: 1000,
+          type: "income",
+          date: new Date(),
+        });
       expect(res.statusCode).toBe(201);
     });
 
@@ -36,12 +41,19 @@ describe("Transaction endpoints", () => {
         description: "Viagem",
         targetAmount: 5000,
         targetDate: "2025-01-01T00:00:00.000Z",
+        date: new Date(),
       });
       const goalId = goal.body.goal.id;
 
       const res = await request(app)
         .post(`/transaction/${userId}/${categoryId}`)
-        .send({ description: "Viagem", amount: 1000, type: "goal", goalId });
+        .send({
+          description: "Viagem",
+          amount: 1000,
+          type: "goal",
+          goalId,
+          date: "01-01-2025",
+        });
 
       expect(res.statusCode).toBe(201);
     });
@@ -49,7 +61,12 @@ describe("Transaction endpoints", () => {
     it("FALHA - tipo inválido", async () => {
       const res = await request(app)
         .post(`/transaction/${userId}/${categoryId}`)
-        .send({ description: "Salário", amount: 1000, type: "invalid_type" });
+        .send({
+          description: "Salário",
+          amount: 1000,
+          type: "invalid_type",
+          date: "01-01-2025",
+        });
 
       expect(res.statusCode).toBe(400);
     });
@@ -57,14 +74,29 @@ describe("Transaction endpoints", () => {
     it("FALHA - campos vazios", async () => {
       const res1 = await request(app)
         .post(`/transaction/${userId}/${categoryId}`)
-        .send({ description: "", amount: 1000, type: "income" });
+        .send({
+          description: "",
+          amount: 1000,
+          type: "income",
+          date: "01-01-2025",
+        });
 
       const res2 = await request(app)
         .post(`/transaction/${userId}/${categoryId}`)
-        .send({ description: "Salário", amount: "", type: "income" });
+        .send({
+          description: "Salário",
+          amount: "",
+          type: "income",
+          date: "01-01-2025",
+        });
       const res3 = await request(app)
         .post(`/transaction/${userId}/${categoryId}`)
-        .send({ description: "Salário", amount: 1000, type: "" });
+        .send({
+          description: "Salário",
+          amount: 1000,
+          type: "",
+          date: "01-01-2025",
+        });
 
       expect(res1.statusCode).toBe(400);
       expect(res2.statusCode).toBe(400);
@@ -74,15 +106,23 @@ describe("Transaction endpoints", () => {
     it("FALHA - usuário inválido", async () => {
       const res = await request(app)
         .post(`/transaction/99999/${categoryId}`)
-        .send({ description: "Salário", amount: 1000, type: "income" });
+        .send({
+          description: "Salário",
+          amount: 1000,
+          type: "income",
+          date: "01-01-2025",
+        });
 
       expect(res.statusCode).toBe(404);
     });
 
     it("FALHA - categoria inválida", async () => {
-      const res = await request(app)
-        .post(`/transaction/${userId}/99999`)
-        .send({ description: "Salário", amount: 1000, type: "income" });
+      const res = await request(app).post(`/transaction/${userId}/99999`).send({
+        description: "Salário",
+        amount: 1000,
+        type: "income",
+        date: new Date(),
+      });
 
       expect(res.statusCode).toBe(404);
     });
@@ -90,6 +130,8 @@ describe("Transaction endpoints", () => {
 
   describe("GET /transaction/:userId", () => {
     it("SUCESSO - lista transações", async () => {
+      const date = new Date();
+
       await prisma.transaction.create({
         data: {
           description: "Salário",
@@ -97,6 +139,7 @@ describe("Transaction endpoints", () => {
           type: "income",
           userId,
           categoryId,
+          date: date,
         },
       });
       const res = await request(app).get(`/transaction/${userId}`);
@@ -111,6 +154,8 @@ describe("Transaction endpoints", () => {
       });
       const goalId = goal.body.goal.id;
 
+      const date = new Date();
+
       await prisma.transaction.create({
         data: {
           description: "Viagem",
@@ -119,6 +164,7 @@ describe("Transaction endpoints", () => {
           userId,
           categoryId,
           goalId,
+          date: date,
         },
       });
       const res = await request(app).get(`/transaction/${userId}`);

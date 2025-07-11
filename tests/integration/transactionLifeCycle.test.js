@@ -26,7 +26,12 @@ describe("Transaction integration tests", () => {
       .post(
         `/transaction/${loginRes.body.userWithoutPassword.id}/${categoryRes.body.category.id}`
       )
-      .send({ description: "Viagem", amount: 1000, type: "expense" });
+      .send({
+        description: "Viagem",
+        amount: 1000,
+        type: "expense",
+        date: "2025-01-01",
+      });
 
     expect(transactionRes.statusCode).toBe(201);
   });
@@ -54,7 +59,12 @@ describe("Transaction integration tests", () => {
       .post(
         `/transaction/${loginRes.body.userWithoutPassword.id}/${categoryRes.body.category.id}`
       )
-      .send({ description: "Viagem", amount: "fasdfasdf", type: "expense" });
+      .send({
+        description: "Viagem",
+        amount: "fasdfasdf",
+        type: "expense",
+        date: "2025-01-01",
+      });
 
     expect(transactionRes.statusCode).toBe(400);
   });

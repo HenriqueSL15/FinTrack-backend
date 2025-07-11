@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 beforeEach(async () => {
-  console.log("DB_URL atual:", process.env.DATABASE_URL);
+  // console.log("DB_URL atual:", process.env.DATABASE_URL);
   if (!process.env.DATABASE_URL.includes("ep-wispy-sun-acovygz6-pooler")) {
     throw new Error("NUNCA rode testes em banco de produção/desenvolvimento!");
   }

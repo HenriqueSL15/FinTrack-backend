@@ -66,14 +66,8 @@ exports.getGoals = async (req, res) => {
 // Atualiza um objetivo de um usuário
 exports.updateGoal = async (req, res) => {
   const { goalId, userId } = req.params;
-  const {
-    description,
-    targetAmount,
-    currentAmount,
-    targetDate,
-    balance,
-    date,
-  } = req.body;
+  const { description, targetAmount, currentAmount, targetDate, balance } =
+    req.body;
 
   // Procura o objetivo
   const goal = await prisma.goal.findUnique({
@@ -103,7 +97,7 @@ exports.updateGoal = async (req, res) => {
   }
 
   // Verifica se o targetAmount é um número
-  if (typeof targetAmount !== "number" && typeof Number(targetAmount) === NaN) {
+  if (typeof targetAmount !== "number" && isNaN(Number(targetAmount))) {
     return res.status(400).json({ message: "Valor inválido" });
   }
 
@@ -120,7 +114,7 @@ exports.updateGoal = async (req, res) => {
   }
 
   if (balance < currentAmount) {
-    return res.status(404).json({ message: "Saldo indisponível" });
+    return res.status(400).json({ message: "Saldo indisponível" });
   }
 
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado
@@ -129,23 +123,31 @@ exports.updateGoal = async (req, res) => {
       description != goal.description ? description : goal.description,
     targetAmount:
       targetAmount != goal.targetAmount ? targetAmount : goal.targetAmount,
-    currentAmount:
-      currentAmount != goal.currentAmount ? currentAmount : goal.currentAmount,
-    targetDate:
-      targetDate != goal.targetDate.toISOString()
-        ? targetDate
-        : goal.targetDate,
+    targetDate,
   };
+
+  if (currentAmount < goal.currentAmount) {
+    return res.status(404).json({ message: "Valor baixo" });
+  }
+  console.log(currentAmount, goal.currentAmount);
+  const amount = currentAmount - goal.currentAmount;
+  if (typeof amount !== "number" || isNaN(amount)) {
+    return res.status(400).json({ message: "Valor de amount inválido" });
+  }
 
   // Cria transação de tipo Goal
   const goalTransaction = await prisma.transaction.create({
     data: {
       description: data.description,
-      amount: data.currentAmount - goal.currentAmount,
+      amount: amount,
       type: "goal",
-      userId: Number(userId),
-      goalId: Number(goalId),
-      date: new Date(date),
+      user: {
+        connect: { id: Number(userId) },
+      },
+      goal: {
+        connect: { id: Number(goalId) },
+      },
+      date: new Date(),
     },
   });
 

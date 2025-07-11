@@ -87,18 +87,21 @@ describe("Goal endpoints", () => {
   });
 
   describe("PUT /goal/:userId/:goalId", () => {
+    const date = new Date();
+
     it("SUCESSO - atualiza objetivo", async () => {
       const goal = await request(app).post(`/goal/${userId}`).send({
         description: "Viagem",
         targetAmount: 5000,
-        targetDate: "2025-01-01T00:00:00.000Z",
+        targetDate: date,
       });
       goalId = goal.body.goal.id;
 
       const res = await request(app).put(`/goal/${userId}/${goalId}`).send({
         description: "Viagem",
         targetAmount: 5000,
-        targetDate: "2025-01-01T00:00:00.000Z",
+        currentAmount: 500,
+        targetDate: date,
       });
 
       expect(res.statusCode).toBe(200);
@@ -108,7 +111,7 @@ describe("Goal endpoints", () => {
       const res = await request(app).put(`/goal/${userId}/99999`).send({
         description: "Viagem",
         targetAmount: 5000,
-        targetDate: "2025-01-01T00:00:00.000Z",
+        targetDate: date,
       });
 
       expect(res.statusCode).toBe(404);
@@ -118,7 +121,7 @@ describe("Goal endpoints", () => {
       const res = await request(app).put(`/goal/99999/${goalId}`).send({
         description: "Viagem",
         targetAmount: 5000,
-        targetDate: "2025-01-01T00:00:00.000Z",
+        targetDate: date,
       });
 
       expect(res.statusCode).toBe(404);

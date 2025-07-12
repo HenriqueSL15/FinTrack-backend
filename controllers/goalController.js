@@ -119,13 +119,22 @@ exports.updateGoal = async (req, res) => {
     return res.status(400).json({ message: "Saldo indisponível" });
   }
 
-  if (currentAmount < goal.currentAmount) {
-    return res.status(404).json({ message: "Valor baixo" });
-  }
-
   const amount = currentAmount - goal.currentAmount;
   if (typeof amount !== "number" || isNaN(amount)) {
     return res.status(400).json({ message: "Valor de amount inválido" });
+  }
+
+  if (currentAmount < goal.currentAmount) {
+    const refundAmount = goal.currentAmount - currentAmount;
+    await prisma.transaction.create({
+      data: {
+        description: `Reembolso de ${goal.description}`,
+        amount: refundAmount,
+        type: "income",
+        user: { connect: { id: Number(userId) } },
+        date: new Date(),
+      },
+    });
   }
 
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado

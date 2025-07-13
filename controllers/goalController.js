@@ -114,21 +114,15 @@ exports.updateGoal = async (req, res) => {
   }
 
   const amount = currentAmount - goal.currentAmount;
-  if (typeof amount !== "number" || isNaN(amount)) {
-    return res.status(400).json({ message: "Valor de amount inválido" });
+
+  if (amount < 0) {
+    return res.status(400).json({
+      message: "O valor atual não pode ser menor que o valor atual do objetivo",
+    });
   }
 
-  if (currentAmount < goal.currentAmount) {
-    const refundAmount = goal.currentAmount - currentAmount;
-    await prisma.transaction.create({
-      data: {
-        description: `Reembolso de ${goal.description}`,
-        amount: refundAmount,
-        type: "income",
-        user: { connect: { id: Number(userId) } },
-        date: new Date(),
-      },
-    });
+  if (typeof amount !== "number" || isNaN(amount)) {
+    return res.status(400).json({ message: "Valor de amount inválido" });
   }
 
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado

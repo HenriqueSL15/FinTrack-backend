@@ -66,8 +66,26 @@ exports.getGoals = async (req, res) => {
 // Atualiza um objetivo de um usuário
 exports.updateGoal = async (req, res) => {
   const { goalId, userId } = req.params;
-  const { description, targetAmount, currentAmount, targetDate, balance } =
+  const { description, targetAmount, currentAmount, targetDate, status } =
     req.body;
+
+  let updatedAmount = currentAmount;
+
+  if (status) {
+    const goal = await prisma.goal.update({
+      where: {
+        id: Number(goalId),
+        userId: Number(userId),
+      },
+      data: {
+        status,
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Status do objetivo atualizado com sucesso!", goal });
+  }
 
   // Procura o objetivo
   const goal = await prisma.goal.findUnique({
@@ -105,7 +123,7 @@ exports.updateGoal = async (req, res) => {
   const isEverythingEqual =
     goal.description === description &&
     goal.targetAmount === targetAmount &&
-    goal.currentAmount === currentAmount &&
+    goal.currentAmount === updatedAmount &&
     goal.targetDate.toISOString() === targetDate;
 
   // Se nada foi alterado, retorna erro
@@ -113,7 +131,7 @@ exports.updateGoal = async (req, res) => {
     return res.status(400).json({ message: "Nada foi alterado" });
   }
 
-  const amount = currentAmount - goal.currentAmount;
+  const amount = updatedAmount - goal.currentAmount;
 
   if (amount < 0) {
     return res.status(400).json({
@@ -125,13 +143,15 @@ exports.updateGoal = async (req, res) => {
     return res.status(400).json({ message: "Valor de amount inválido" });
   }
 
+  if (updatedAmount > goal.targetAmount) updatedAmount = goal.targetAmount;
+
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado
   const data = {
     description:
       description != goal.description ? description : goal.description,
     targetAmount:
       targetAmount != goal.targetAmount ? targetAmount : goal.targetAmount,
-    currentAmount,
+    currentAmount: updatedAmount,
     targetDate,
   };
 

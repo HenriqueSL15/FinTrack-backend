@@ -31,9 +31,9 @@ router.put(
   goalController.updateGoal
 );
 
-// Rota: DELETE /goal/:userId/:goalId
+// Rota: DELETE /goal/:userId/:goalId:percentage
 router.delete(
-  "/:userId/:goalId",
+  "/:userId/:goalId/:percentage",
   goalValidator.delete,
   validateRequest,
   goalController.deleteGoal

@@ -131,6 +131,8 @@ exports.updateGoal = async (req, res) => {
     return res.status(400).json({ message: "Nada foi alterado" });
   }
 
+  if (updatedAmount > goal.targetAmount) updatedAmount = goal.targetAmount;
+
   const amount = updatedAmount - goal.currentAmount;
 
   if (amount < 0) {
@@ -142,8 +144,6 @@ exports.updateGoal = async (req, res) => {
   if (typeof amount !== "number" || isNaN(amount)) {
     return res.status(400).json({ message: "Valor de amount inválido" });
   }
-
-  if (updatedAmount > goal.targetAmount) updatedAmount = goal.targetAmount;
 
   // Preenche os campos que não foram preenchidos para só atualizar o que foi alterado
   const data = {
@@ -192,7 +192,7 @@ exports.updateGoal = async (req, res) => {
 
 // Deleta o objetivo de um usuário
 exports.deleteGoal = async (req, res) => {
-  const { goalId, userId } = req.params;
+  const { goalId, userId, percentage } = req.params;
 
   // Verifica se o usuário existe
   if (
@@ -205,15 +205,38 @@ exports.deleteGoal = async (req, res) => {
     return res.status(404).json({ message: "Usuário não encontrado" });
   }
 
-  // Deleta o objetivo
-  const goal = await prisma.goal.delete({
-    where: {
-      id: Number(goalId),
-      userId: Number(userId),
-    },
-  });
+  if (percentage) {
+    if (percentage == 100) {
+      // Deleta o objetivo
+      const goal = await prisma.goal.delete({
+        where: {
+          id: Number(goalId),
+          userId: Number(userId),
+        },
+      });
 
-  return res
-    .status(200)
-    .json({ message: "Objetivo deletado com sucesso!", goal });
+      return res
+        .status(200)
+        .json({ message: "Objetivo deletado com sucesso!", goal });
+    } else {
+      await prisma.transaction.deleteMany({
+        where: {
+          type: "goal",
+          goalId: Number(goalId),
+        },
+      });
+
+      // Deleta o objetivo
+      const goal = await prisma.goal.delete({
+        where: {
+          id: Number(goalId),
+          userId: Number(userId),
+        },
+      });
+
+      return res
+        .status(200)
+        .json({ message: "Objetivo deletado com sucesso!", goal });
+    }
+  }
 };

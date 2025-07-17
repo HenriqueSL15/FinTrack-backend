@@ -78,7 +78,32 @@ exports.createTransaction = async (req, res) => {
 exports.deleteOneTransaction = async (req, res) => {
   const { transactionId, userId } = req.params;
 
-  const transaction = await prisma.transaction.delete({
+  // Verifica se o usuáio existe
+  const user = await prisma.user.findUnique({
+    where: {
+      id: Number(userId),
+    },
+  });
+
+  // Retona um erro caso o usuário não exista
+  if (!user) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
+
+  const transaction = await prisma.transaction.findFirst({
+    where: {
+      userId: Number(userId),
+      id: Number(transactionId),
+    },
+  });
+
+  // Retorna um erro caso a transação não exista
+  if (!transaction) {
+    return res.status(404).json({ message: "Transação não encontrada" });
+  }
+
+  // Deleta a transação
+  await prisma.transaction.delete({
     where: {
       id: Number(transactionId),
       userId: Number(userId),

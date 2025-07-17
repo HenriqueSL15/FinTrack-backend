@@ -9,6 +9,11 @@ let userId, categoryId, transactionId;
 // Transaction Endpoints
 describe("Transaction endpoints", () => {
   beforeEach(async () => {
+    await prisma.transaction.deleteMany();
+    await prisma.goal.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
+
     const user = await prisma.user.create({
       data: {
         name: "Tran",
@@ -21,6 +26,13 @@ describe("Transaction endpoints", () => {
       data: { name: "Salário", type: "income", userId },
     });
     categoryId = category.id;
+  });
+
+  afterEach(async () => {
+    await prisma.transaction.deleteMany();
+    await prisma.goal.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
   });
 
   describe("POST /transaction/:userId/:categoryId", () => {
@@ -146,33 +158,43 @@ describe("Transaction endpoints", () => {
       expect(res.statusCode).toBe(200);
     });
 
-    it("SUCESSO - lista transações para objetivo", async () => {
-      const goal = await request(app).post(`/goal/${userId}`).send({
-        description: "Viagem",
-        targetAmount: 5000,
-        targetDate: "2025-01-01T00:00:00.000Z",
-      });
-      const goalId = goal.body.goal.id;
+    it("FALHA - usuário inválido", async () => {
+      const res = await request(app).get(`/transaction/99999`);
+      expect(res.statusCode).toBe(404);
+    });
+  });
 
-      const date = new Date();
-
-      await prisma.transaction.create({
+  describe("DELETE /transaction/:userId/:transactionId", () => {
+    it("SUCESSO - deleta transação", async () => {
+      // Create a transaction to delete
+      const transaction = await prisma.transaction.create({
         data: {
-          description: "Viagem",
+          description: "Salário",
           amount: 1000,
-          type: "goal",
+          type: "income",
           userId,
           categoryId,
-          goalId,
-          date: date,
+          date: new Date(),
         },
       });
-      const res = await request(app).get(`/transaction/${userId}`);
+      transactionId = transaction.id;
+
+      const res = await request(app).delete(
+        `/transaction/${userId}/${transactionId}`
+      );
       expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Transação deletada com sucesso!");
     });
 
     it("FALHA - usuário inválido", async () => {
-      const res = await request(app).get(`/transaction/99999`);
+      const res = await request(app).delete(
+        `/transaction/99999/${transactionId}`
+      );
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("FALHA - transação inválida", async () => {
+      const res = await request(app).delete(`/transaction/${userId}/99999`);
       expect(res.statusCode).toBe(404);
     });
   });

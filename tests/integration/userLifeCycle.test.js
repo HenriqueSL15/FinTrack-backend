@@ -3,7 +3,7 @@ const app = require("../../index");
 
 // User integration tests
 describe("User integration tests", () => {
-  it("should create a new user and login sucessfully", async () => {
+  it("should create a new user and login successfully", async () => {
     // Criação do usuário
     await request(app)
       .post("/users/register")
@@ -70,5 +70,6 @@ describe("User integration tests", () => {
       );
 
     expect(updateRes.statusCode).toBe(200);
+    expect(updateRes.body.user).toBeDefined();
   });
 });

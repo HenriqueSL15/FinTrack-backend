@@ -60,11 +60,36 @@ exports.createCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
   const { categoryId, userId } = req.params;
 
-  // Procura a categoria e deleta
-  const category = await prisma.category.delete({
+  // Verifica se usuário existe
+  const user = await prisma.user.findUnique({
     where: {
-      userId: Number(userId),
+      id: Number(userId),
+    },
+  });
+
+  // Caso usuário não exista, retorna erro
+  if (!user) {
+    return res.status(404).json({ message: "Usuário não encontrado" });
+  }
+
+  // Verifica se a categoria existe
+  const category = await prisma.category.findFirst({
+    where: {
       id: Number(categoryId),
+      userId: Number(userId),
+    },
+  });
+
+  // Caso essa categoria não exista, retorna erro
+  if (!category) {
+    return res.status(404).json({ message: "Categoria não encontrada" });
+  }
+
+  // Procura a categoria e deleta
+  await prisma.category.delete({
+    where: {
+      id: Number(categoryId),
+      userId: Number(userId),
     },
   });
 

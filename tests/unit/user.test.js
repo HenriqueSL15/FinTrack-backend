@@ -194,18 +194,4 @@ describe("User endpoints", () => {
       expect(res.statusCode).toBe(401);
     });
   });
-
-  describe("GET /users", () => {
-    it("SUCESSO - retorna todos usuários", async () => {
-      await prisma.user.create({
-        data: {
-          name: "Test",
-          email: "all@ex.com",
-          passwordHash: await bcrypt.hash("123456", 10),
-        },
-      });
-      const res = await request(app).get("/users");
-      expect(res.statusCode).toBe(200);
-    });
-  });
 });

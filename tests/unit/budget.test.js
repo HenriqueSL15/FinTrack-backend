@@ -9,6 +9,10 @@ let userId, categoryId, budgetId;
 // Budget Endpoints
 describe("Budget endpoints", () => {
   beforeEach(async () => {
+    await prisma.budget.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
+
     const user = await prisma.user.create({
       data: {
         name: "Budget",
@@ -21,6 +25,12 @@ describe("Budget endpoints", () => {
       data: { name: "Alimentação", type: "expense", userId },
     });
     categoryId = category.id;
+  });
+
+  afterEach(async () => {
+    await prisma.budget.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
   });
 
   describe("POST /budget/:userId/:categoryId", () => {
@@ -84,6 +94,35 @@ describe("Budget endpoints", () => {
 
     it("FALHA - usuário não existe", async () => {
       const res = await request(app).get(`/budget/0`);
+      expect(res.statusCode).toBe(404);
+    });
+  });
+
+  describe("DELETE /budget/:userId/:budgetId", () => {
+    it("SUCESSO - deleta orçamento", async () => {
+      // Create a budget to delete
+      const budget = await prisma.budget.create({
+        data: {
+          monthYear: new Date("2024-06-01T00:00:00.000Z"),
+          limitAmount: 500,
+          userId,
+          categoryId,
+        },
+      });
+      budgetId = budget.id;
+
+      const res = await request(app).delete(`/budget/${userId}/${budgetId}`);
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Orçamento deletado com sucesso!");
+    });
+
+    it("FALHA - usuário inválido", async () => {
+      const res = await request(app).delete(`/budget/99999/${budgetId}`);
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("FALHA - orçamento inválido", async () => {
+      const res = await request(app).delete(`/budget/${userId}/99999`);
       expect(res.statusCode).toBe(404);
     });
   });

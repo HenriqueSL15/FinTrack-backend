@@ -9,6 +9,9 @@ let userId, categoryId;
 // Category Endpoints
 describe("Category endpoints", () => {
   beforeEach(async () => {
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
+
     const user = await prisma.user.create({
       data: {
         name: "Cat",
@@ -93,6 +96,32 @@ describe("Category endpoints", () => {
 
     it("FALHA - usuário não existe(404)", async () => {
       const res = await request(app).get(`/category/99999`);
+      expect(res.statusCode).toBe(404);
+    });
+  });
+
+  describe("DELETE /category/:userId/:categoryId", () => {
+    it("SUCESSO - deleta categoria", async () => {
+      // Create a category to delete
+      const category = await prisma.category.create({
+        data: { name: "Viagem", type: "expense", userId },
+      });
+      categoryId = category.id;
+
+      const res = await request(app).delete(
+        `/category/${userId}/${categoryId}`
+      );
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Categoria deletada com sucesso!");
+    });
+
+    it("FALHA - usuário inválido", async () => {
+      const res = await request(app).delete(`/category/99999/${categoryId}`);
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("FALHA - categoria inválida", async () => {
+      const res = await request(app).delete(`/category/${userId}/99999`);
       expect(res.statusCode).toBe(404);
     });
   });

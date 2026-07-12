@@ -52,6 +52,11 @@ model Transaction {
   category    Category? @relation(fields: [categoryId], references: [id])
   goal        Goal?    @relation(fields: [goalId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
+  
+  installmentPlanId Int? @map("installment_plan_id")
+  installmentPlanNumber Int? @map("installment_plan_number")
+  installmentPlan InstallmentPlan? @relation(fields: [installmentPlanId], references: [id])
+
 
   @@map("transactions")
 }
@@ -85,4 +90,20 @@ model Goal {
   transactions  Transaction[]
 
   @@map("goals")
+}
+
+model InstallmentPlan {
+  id           Int       @id @default(autoincrement())
+  description     String
+  principalAmount Float              
+  interestRate    Float    @default(0)  
+  installmentCount Int                
+  startDate       DateTime
+  userId          Int
+  categoryId      Int?
+  user            User     @relation(fields: [userId], references: [id])
+  category        Category? @relation(fields: [categoryId], references: [id])
+  transactions    Transaction[]
+
+  @@map("installment_plans")
 }

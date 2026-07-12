@@ -21,7 +21,7 @@ router.post(
   "/register",
   userValidator.create,
   validateRequest,
-  userController.createUser
+  userController.createUser,
 );
 
 // Rota: GET /users
@@ -33,7 +33,7 @@ router.get(
   authenticateUser,
   userValidator.get,
   validateRequest,
-  userController.getOneUser
+  userController.getOneUser,
 );
 
 // Rota: POST /users/login
@@ -41,7 +41,7 @@ router.post(
   "/login",
   userValidator.login,
   validateRequest,
-  userController.loginUser
+  userController.loginUser,
 );
 
 // Rota: PUT /users/:userId
@@ -51,13 +51,13 @@ router.put(
   authorizeUser,
   userValidator.update,
   validateRequest,
-  userController.updateUser
+  userController.updateUser,
 );
 
 // Rota: POST /users/refresh-token
 router.post("/refresh-token", refreshTokens);
 
 // Rota: POST /users/logout
-router.post("/logout", authenticateUser, userController.logoutUser);
+router.post("/logout", userController.logoutUser);
 
 module.exports = router;

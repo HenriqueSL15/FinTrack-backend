@@ -12,7 +12,7 @@ exports.generateAccessToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email },
     JWT_SECRET,
-    { expiresIn: "15m" } // Token expira em 15 minutos
+    { expiresIn: "15m" }, // Token expira em 15 minutos
   );
 };
 
@@ -21,7 +21,7 @@ exports.generateRefreshToken = (user) => {
   return jwt.sign(
     { id: user.id },
     REFRESH_SECRET,
-    { expiresIn: "7d" } // Refresh token expira em 7 dias
+    { expiresIn: "7d" }, // Refresh token expira em 7 dias
   );
 };
 
@@ -30,7 +30,9 @@ exports.authenticateUser = async (req, res, next) => {
   const token = req.cookies.accessToken;
 
   if (!token) {
-    return res.status(401).json({ message: "Autenticação necessária" });
+    return res
+      .status(401)
+      .json({ message: "Autenticação necessária", tokenExpired: true });
   }
 
   try {
